@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZIGZAG KEYWORD</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171a2b; --panel2:#1e2236; --line:#2a2f47;
+    --text:#e8eaf2; --muted:#9aa0b5; --accent:#ff2e74; --accent2:#5b8cff;
+    --good:#26d07c; --bad:#ff5a6a; --chip:#242942;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;}
+  a{color:var(--accent2)}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:linear-gradient(180deg,#141830,#0f1220)}
+  .brand{font-weight:800;letter-spacing:.5px;font-size:20px}
+  .brand b{color:var(--accent)}
+  .brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:.3px;margin-top:2px}
+  .grow{flex:1}
+  .cfg{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cfg input{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    padding:8px 10px;border-radius:8px;font-size:12px}
+  .cfg input.id{width:210px}
+  .cfg input.tab{width:150px}
+  button{background:var(--accent);color:#fff;border:0;padding:9px 14px;border-radius:8px;
+    font-weight:700;cursor:pointer;font-size:13px}
+  button.ghost{background:var(--chip);color:var(--text);font-weight:600}
+  .seg{display:inline-flex;background:var(--chip);border-radius:8px;padding:2px}
+  .seg .segb{background:transparent;color:var(--muted);padding:6px 12px;border-radius:6px;font-weight:700;font-size:12px}
+  .seg .segb.on{background:var(--accent);color:#fff}
+  button:hover{filter:brightness(1.08)}
+  .status{font-size:12px;color:var(--muted)}
+  .status.err{color:var(--bad)}
+  .wrap{padding:20px 24px;max-width:1200px;margin:0 auto}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .l{font-size:12px;color:var(--muted)}
+  .kpi .v{font-size:24px;font-weight:800;margin-top:4px}
+  nav.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  nav.tabs .t{background:var(--chip);color:var(--muted);padding:9px 16px;border-radius:999px;
+    cursor:pointer;font-weight:700;font-size:13px;border:1px solid transparent}
+  nav.tabs .t.on{background:var(--panel);color:var(--text);border-color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .card h3{margin:0 0 4px;font-size:15px}
+  .card .sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  select,input.k{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    padding:8px 10px;border-radius:8px;font-size:13px}
+  input.k{width:220px}
+  label.cl{font-size:12px;color:var(--muted)}
+  .chartrow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.chartrow{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+  .chartbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .chartbox .ct{font-size:12px;color:var(--muted);margin-bottom:6px}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th:nth-child(2),td:nth-child(2),th.l,td.l{text-align:left}
+  thead th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}
+  tbody tr:hover{background:var(--panel2)}
+  .tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+  .up{background:rgba(38,208,124,.16);color:var(--good)}
+  .down{background:rgba(255,90,106,.16);color:var(--bad)}
+  .comp{font-size:11px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13px;padding:8px 0}
+  .barrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+  .barrow .nm{width:120px;text-align:right;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barrow .bar{height:16px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .barrow .val{color:var(--muted);width:70px}
+  .note{background:rgba(91,140,255,.1);border:1px solid rgba(91,140,255,.35);color:#bcd0ff;
+    padding:10px 12px;border-radius:10px;font-size:12px;margin-bottom:12px}
+  .foot{color:var(--muted);font-size:11px;text-align:center;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">⚡ <b>ZIGZAG</b> KEYWORD<small>키워드 인사이트 대시보드 · 구글시트 라이브</small></div>
+  <div class="grow"></div>
+  <div class="cfg">
+    <input class="id" id="sheetId" placeholder="구글시트 ID" title="시트 URL의 /d/ 다음 부분">
+    <input class="tab" id="tabName" placeholder="탭 이름">
+    <button id="loadBtn">불러오기</button>
+    <button class="ghost" id="fileBtn">CSV 업로드</button>
+    <input type="file" id="fileInput" accept=".csv" style="display:none">
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="status" id="status">시트 정보를 입력하고 <b>불러오기</b>를 누르세요.</div>
+
+  <div class="kpis" id="kpis" style="display:none">
+    <div class="kpi"><div class="l">수집 일자 수</div><div class="v" id="k_dates">-</div></div>
+    <div class="kpi"><div class="l">고유 키워드</div><div class="v" id="k_kw">-</div></div>
+    <div class="kpi"><div class="l">총 행 수</div><div class="v" id="k_rows">-</div></div>
+    <div class="kpi"><div class="l">최신 일자</div><div class="v" id="k_last">-</div></div>
+  </div>
+
+  <nav class="tabs" id="nav" style="display:none">
+    <div class="t on" data-v="trend">키워드 추이</div>
+    <div class="t" data-v="topn">일자별 TOP N</div>
+    <div class="t" data-v="rising">급상승 키워드</div>
+  </nav>
+
+  <!-- 1. 키워드 추이 -->
+  <section id="view_trend" class="view">
+    <div class="card">
+      <h3>키워드 추이</h3>
+      <div class="sub">키워드를 선택하면 날짜별 검색량·순위 변화를 보여줍니다.</div>
+      <div class="controls">
+        <label class="cl">포함 검색</label>
+        <input class="k" id="kwSearch" placeholder='예: 얇은 / 브라 / 원피스'>
+        <span class="cl" id="matchCount"></span>
+        <button class="ghost" id="selAll" style="padding:6px 10px">전체 표시</button>
+        <button class="ghost" id="selNone" style="padding:6px 10px">전체 해제</button>
+        <span class="grow"></span>
+        <label class="cl">지표</label>
+        <span class="seg" id="metricSeg">
+          <button class="segb on" data-m="vol">검색량</button>
+          <button class="segb" data-m="rank">순위</button>
+        </span>
+      </div>
+      <div id="trendKpis" class="kpis" style="grid-template-columns:repeat(3,1fr);display:none">
+        <div class="kpi"><div class="l">매칭 키워드</div><div class="v" id="t_cnt">-</div></div>
+        <div class="kpi"><div class="l">최신일 합계 검색량</div><div class="v" id="t_sum">-</div></div>
+        <div class="kpi"><div class="l">최다 검색 키워드</div><div class="v" id="t_top">-</div></div>
+      </div>
+      <div class="chartrow" style="margin-top:14px">
+        <div class="chartbox"><div class="ct" id="volCt">검색량 추이 (체크한 키워드)</div><div id="chart_vol"></div></div>
+        <div class="chartbox" style="padding:0"><div class="tablewrap"><table id="matchTable"></table></div></div>
+      </div>
+      <div id="trendEmpty" class="empty">위에 포함할 단어를 입력하세요. (예: "얇은")</div>
+    </div>
+  </section>
+
+  <!-- 2. 일자별 TOP N -->
+  <section id="view_topn" class="view" style="display:none">
+    <div class="card">
+      <h3>일자별 TOP N</h3>
+      <div class="sub">선택한 일자의 검색량 상위 키워드입니다.</div>
+      <div class="controls">
+        <label class="cl">일자</label><select id="topDate"></select>
+        <label class="cl">개수</label>
+        <select id="topN"><option>10</option><option selected>20</option><option>50</option><option>100</option></select>
+      </div>
+      <div class="chartrow">
+        <div class="chartbox"><div class="ct">검색량 TOP</div><div id="topBars"></div></div>
+        <div class="chartbox" style="padding:0">
+          <div class="tablewrap"><table id="topTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 급상승 키워드 -->
+  <section id="view_rising" class="view" style="display:none">
+    <div class="card">
+      <h3>급상승 키워드</h3>
+      <div class="sub">선택한 일자에 증감률이 높은 키워드 순입니다.</div>
+      <div class="controls">
+        <label class="cl">일자</label><select id="riseDate"></select>
+        <label class="cl">개수</label>
+        <select id="riseN"><option>10</option><option selected>20</option><option>50</option></select>
+      </div>
+      <div class="tablewrap"><table id="riseTable"></table></div>
+    </div>
+  </section>
+
+  <div class="foot">ZIGZAG KEYWORD · 데이터: 구글시트 라이브 · 새로고침하면 최신 시트가 반영됩니다.</div>
+</div>
+
+<script>
+"use strict";
+var DEFAULT_ID = "1BrEkSWOBl3PuHSrPQrD2CPwkrZ2VQ4vqKeOBUATSQH4";
+var DEFAULT_TAB = "어제 인기 키워드";
+var COLS = {}, ROWS = [], DATES = [];
+
+// ---------- helpers ----------
+function $(id){return document.getElementById(id);}
+function numVol(s){ if(s==null) return NaN; return parseFloat(String(s).replace(/[^0-9.\-]/g,"")); }
+function numPct(s){ // "-23%" -> -23 ; ratio "0.2" -> 20 ; "3" -> 300
+  if(s==null||s==="") return NaN;
+  var t=String(s).trim();
+  if(t.indexOf("%")>=0) return parseFloat(t.replace(/[^0-9.\-]/g,""));
+  var v=parseFloat(t.replace(/[^0-9.\-]/g,"")); if(isNaN(v)) return NaN;
+  return Math.abs(v)<=5 ? v*100 : v; // small magnitude treated as ratio
+}
+function fmt(n){ return isNaN(n)?"-":n.toLocaleString(); }
+function pctChip(v){
+  if(isNaN(v)) return '<span class="comp">-</span>';
+  var cls=v>=0?"up":"down", sign=v>=0?"+":"";
+  return '<span class="chip '+cls+'">'+sign+Math.round(v)+'%</span>';
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+// ---------- CSV parse ----------
+function parseCSV(text){
+  var rows=[], row=[], f="", i=0, q=false, c;
+  while(i<text.length){
+    c=text[i];
+    if(q){
+      if(c=='"'){ if(text[i+1]=='"'){f+='"';i++;} else q=false; }
+      else f+=c;
+    }else{
+      if(c=='"') q=true;
+      else if(c==','){ row.push(f); f=""; }
+      else if(c=='\n'){ row.push(f); rows.push(row); row=[]; f=""; }
+      else if(c=='\r'){}
+      else f+=c;
+    }
+    i++;
+  }
+  if(f.length||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+
+function detectCols(header){
+  var m={};
+  header.forEach(function(h,idx){
+    var t=(h||"").trim();
+    if(/일자|날짜|date/i.test(t) && m.date==null) m.date=idx;
+    else if(/랭킹|순위|rank/i.test(t) && m.rank==null) m.rank=idx;
+    else if(/키워드|keyword/i.test(t) && m.kw==null) m.kw=idx;
+    else if(/1차/.test(t)) m.c1=idx;
+    else if(/2차/.test(t)) m.c2=idx;
+    else if(/3차/.test(t)) m.c3=idx;
+    else if(/전일|전주|전월/.test(t)) m.prev=idx;
+    else if(/검색량/.test(t) && m.vol==null) m.vol=idx;
+    else if(/증감/.test(t)) m.chg=idx;
+    else if(/상품수/.test(t)) m.prod=idx;
+    else if(/경쟁/.test(t)) m.comp=idx;
+  });
+  return m;
+}
+
+function ingest(text){
+  var raw=parseCSV(text).filter(function(r){return r.some(function(x){return (x||"").trim()!=="";});});
+  if(!raw.length) throw new Error("데이터가 비어 있습니다.");
+  // find header row = first row containing 키워드
+  var hi=0;
+  for(var i=0;i<raw.length;i++){ if(raw[i].some(function(x){return /키워드/.test(x||"");})){hi=i;break;} }
+  var header=raw[hi];
+  COLS=detectCols(header);
+  if(COLS.kw==null||COLS.vol==null) throw new Error("키워드/검색량 열을 찾지 못했습니다. 헤더를 확인하세요.");
+  ROWS=[];
+  for(var j=hi+1;j<raw.length;j++){
+    var r=raw[j];
+    var kw=(r[COLS.kw]||"").trim();
+    if(!kw) continue;
+    ROWS.push({
+      date:(COLS.date!=null?(r[COLS.date]||"").trim():""),
+      rank:COLS.rank!=null?numVol(r[COLS.rank]):NaN,
+      kw:kw,
+      c1:COLS.c1!=null?(r[COLS.c1]||"").trim():"",
+      c2:COLS.c2!=null?(r[COLS.c2]||"").trim():"",
+      c3:COLS.c3!=null?(r[COLS.c3]||"").trim():"",
+      vol:numVol(r[COLS.vol]),
+      prev:COLS.prev!=null?numVol(r[COLS.prev]):NaN,
+      chg:COLS.chg!=null?numPct(r[COLS.chg]):NaN,
+      prod:COLS.prod!=null?numVol(r[COLS.prod]):NaN,
+      comp:COLS.comp!=null?(r[COLS.comp]||"").trim():""
+    });
+  }
+  DATES=Array.from(new Set(ROWS.map(function(r){return r.date;}).filter(Boolean))).sort();
+}
+
+// ---------- SVG charts ----------
+function lineChart(el, pts, opts){
+  opts=opts||{};
+  var W=420,H=210,pl=46,pr=14,pt=12,pb=28;
+  if(!pts.length){ el.innerHTML='<div class="empty">데이터 없음</div>'; return; }
+  var xs=pts.map(function(p,i){return i;});
+  var ys=pts.map(function(p){return p.y;});
+  var ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
+  if(opts.invert){ var tmp=ymin; ymin=ymax; ymax=tmp; } // handled in scale below
+  var lo=Math.min.apply(null,ys), hi=Math.max.apply(null,ys);
+  if(lo===hi){ lo=lo-1; hi=hi+1; }
+  var n=pts.length;
+  function X(i){ return pl + (n===1? (W-pl-pr)/2 : (i/(n-1))*(W-pl-pr)); }
+  function Y(v){
+    var t=(v-lo)/(hi-lo);
+    if(opts.invert) t=1-t; // for rank, smaller is better -> higher
+    return pt + (1-t)*(H-pt-pb);
+  }
+  var g='';
+  // grid + y labels
+  for(var k=0;k<=4;k++){
+    var yy=pt+(k/4)*(H-pt-pb);
+    var val=opts.invert ? (lo+(k/4)*(hi-lo)) : (hi-(k/4)*(hi-lo));
+    g+='<line x1="'+pl+'" y1="'+yy+'" x2="'+(W-pr)+'" y2="'+yy+'" stroke="#2a2f47"/>';
+    g+='<text x="'+(pl-6)+'" y="'+(yy+4)+'" fill="#9aa0b5" font-size="10" text-anchor="end">'+Math.round(val).toLocaleString()+'</text>';
+  }
+  // path
+  var d='';
+  pts.forEach(function(p,i){ d+=(i?'L':'M')+X(i)+' '+Y(p.y)+' '; });
+  g+='<path d="'+d+'" fill="none" stroke="'+(opts.color||'#ff2e74')+'" stroke-width="2.5"/>';
+  // area
+  var da=d+'L'+X(n-1)+' '+(H-pb)+' L'+X(0)+' '+(H-pb)+' Z';
+  g+='<path d="'+da+'" fill="'+(opts.color||'#ff2e74')+'" opacity="0.10"/>';
+  // points + x labels
+  pts.forEach(function(p,i){
+    g+='<circle cx="'+X(i)+'" cy="'+Y(p.y)+'" r="3.2" fill="'+(opts.color||'#ff2e74')+'"><title>'+esc(p.x)+' : '+ (opts.invert?('순위 '+p.y):p.y.toLocaleString()) +'</title></circle>';
+    if(n<=12||i%Math.ceil(n/8)===0){
+      g+='<text x="'+X(i)+'" y="'+(H-8)+'" fill="#9aa0b5" font-size="9" text-anchor="middle">'+esc((p.x||'').slice(5))+'</text>';
+    }
+  });
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+g+'</svg>';
+}
+
+// ---------- views ----------
+function renderKpis(){
+  $("k_dates").textContent=DATES.length;
+  $("k_kw").textContent=new Set(ROWS.map(function(r){return r.kw;})).size.toLocaleString();
+  $("k_rows").textContent=ROWS.length.toLocaleString();
+  $("k_last").textContent=DATES.length?DATES[DATES.length-1]:"-";
+  $("kpis").style.display="grid"; $("nav").style.display="flex";
+}
+
+function fillKeywordList(){
+  var kws=Array.from(new Set(ROWS.map(function(r){return r.kw;}))).sort();
+  $("kwList").innerHTML=kws.map(function(k){return '<option value="'+esc(k)+'">';}).join("");
+}
+
+var PALETTE=["#ff2e74","#5b8cff","#26d07c","#ffb020","#b06bff","#00c2c7","#ff7a59","#8bd450","#e05fa8","#4dd0e1"];
+var SEARCH_TERM="", SELECTED=new Set(), TREND_METRIC="vol";
+
+function currentMatches(){
+  if(!SEARCH_TERM) return [];
+  var term=SEARCH_TERM.toLowerCase();
+  var byKw={};
+  ROWS.forEach(function(r){ if(r.kw.toLowerCase().indexOf(term)>=0){ (byKw[r.kw]=byKw[r.kw]||[]).push(r); } });
+  var arr=Object.keys(byKw).map(function(k){
+    var rs=byKw[k].slice().sort(function(a,b){return a.date<b.date?-1:1;});
+    var last=rs[rs.length-1];
+    return {kw:k, rows:rs, vol:last.vol, rank:last.rank, chg:last.chg, comp:last.comp};
+  });
+  arr.sort(function(a,b){ return (isNaN(b.vol)?-1:b.vol)-(isNaN(a.vol)?-1:a.vol); });
+  return arr;
+}
+function resetSelection(){
+  SELECTED=new Set(currentMatches().slice(0,8).map(function(x){return x.kw;}));
+}
+function lineChartMulti(el, series, opts){
+  opts=opts||{}; var invert=!!opts.invert, metric=opts.metric||"vol";
+  var W=440,H=240,pl=48,pr=14,pt=12,pb=40;
+  if(!series.length){ el.innerHTML='<div class="empty">표에서 키워드를 체크하면 추이가 그려집니다.</div>'; return; }
+  var dates=DATES.slice(), xi={}; dates.forEach(function(d,i){xi[d]=i;});
+  var ys=[]; series.forEach(function(s){ s.points.forEach(function(p){ if(!isNaN(p.y)) ys.push(p.y); }); });
+  if(!ys.length){ el.innerHTML='<div class="empty">데이터 없음</div>'; return; }
+  var lo=Math.min.apply(null,ys), hi=Math.max.apply(null,ys); if(lo===hi){lo=Math.max(0,lo-1);hi=hi+1;}
+  var n=dates.length, plotH=H-pt-pb;
+  function X(i){ return pl+(n===1?(W-pl-pr)/2:(i/(n-1))*(W-pl-pr)); }
+  function Y(v){ var t=(v-lo)/(hi-lo); return pt+(invert? t : (1-t))*plotH; }
+  var g='';
+  for(var k=0;k<=4;k++){ var yy=pt+(k/4)*plotH, val= invert ? (lo+(k/4)*(hi-lo)) : (hi-(k/4)*(hi-lo));
+    g+='<line x1="'+pl+'" y1="'+yy+'" x2="'+(W-pr)+'" y2="'+yy+'" stroke="#2a2f47"/>';
+    g+='<text x="'+(pl-6)+'" y="'+(yy+4)+'" fill="#9aa0b5" font-size="10" text-anchor="end">'+(invert?'#':'')+Math.round(val).toLocaleString()+'</text>'; }
+  dates.forEach(function(d,i){ if(n<=12||i%Math.ceil(n/8)===0) g+='<text x="'+X(i)+'" y="'+(H-8)+'" fill="#9aa0b5" font-size="9" text-anchor="middle">'+esc(d.slice(5))+'</text>'; });
+  series.forEach(function(s){
+    var pts=s.points.filter(function(p){return xi[p.x]!=null && !isNaN(p.y);}).sort(function(a,b){return xi[a.x]-xi[b.x];});
+    if(!pts.length) return;
+    var d=''; pts.forEach(function(p,i){ d+=(i?'L':'M')+X(xi[p.x])+' '+Y(p.y)+' '; });
+    g+='<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="2.4"/>';
+    pts.forEach(function(p){ var lbl=metric==='rank'?('순위 '+p.y):p.y.toLocaleString();
+      g+='<circle cx="'+X(xi[p.x])+'" cy="'+Y(p.y)+'" r="3" fill="'+s.color+'"><title>'+esc(s.name)+' · '+esc(p.x)+' : '+lbl+'</title></circle>'; });
+  });
+  var lg='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">'+series.map(function(s){
+    return '<span style="font-size:11px;color:#cfd3e6"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+s.color+';margin-right:4px;vertical-align:-1px"></span>'+esc(s.name)+'</span>';
+  }).join('')+'</div>';
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">'+g+'</svg>'+lg;
+}
+function drawTrendChart(matches){
+  var sel=matches.filter(function(x){return SELECTED.has(x.kw);});
+  var metric=TREND_METRIC;
+  var series=sel.map(function(x,i){
+    return {name:x.kw, color:PALETTE[i%PALETTE.length],
+      points:x.rows.map(function(r){return {x:r.date, y: metric==='rank'?r.rank:r.vol};})};
+  });
+  var ct=$("volCt"); if(ct) ct.textContent = metric==='rank' ? '순위 추이 (체크한 키워드 · 위=상위)' : '검색량 추이 (체크한 키워드)';
+  lineChartMulti($("chart_vol"), series, {invert:metric==='rank', metric:metric});
+}
+function renderTrendSearch(){
+  var m=currentMatches(), empty=$("trendEmpty"), kbox=$("trendKpis");
+  if(!SEARCH_TERM){ empty.style.display="block"; empty.textContent='위에 포함할 단어를 입력하세요. (예: "얇은")';
+    kbox.style.display="none"; $("chart_vol").innerHTML=""; $("matchTable").innerHTML=""; $("matchCount").textContent=""; return; }
+  $("matchCount").textContent='"'+SEARCH_TERM+'" 포함 '+m.length+'개';
+  if(!m.length){ empty.style.display="block"; empty.textContent="일치하는 키워드가 없습니다.";
+    kbox.style.display="none"; $("chart_vol").innerHTML=""; $("matchTable").innerHTML=""; return; }
+  empty.style.display="none";
+  var sum=m.reduce(function(a,x){return a+(isNaN(x.vol)?0:x.vol);},0);
+  $("t_cnt").textContent=m.length; $("t_sum").textContent=fmt(sum); $("t_top").textContent=m[0].kw;
+  kbox.style.display="grid";
+  var head='<thead><tr><th></th><th>#</th><th class="l">키워드</th><th>검색량</th><th>순위</th><th>증감률</th><th>경쟁</th></tr></thead>';
+  var body=m.map(function(x,i){
+    return '<tr><td><input type="checkbox" class="mchk" '+(SELECTED.has(x.kw)?"checked":"")+' data-kw="'+esc(x.kw)+'"></td>'+
+      '<td>'+(i+1)+'</td><td class="l">'+esc(x.kw)+'</td><td>'+fmt(x.vol)+'</td>'+
+      '<td>'+(isNaN(x.rank)?"-":("#"+x.rank))+'</td><td>'+pctChip(x.chg)+'</td><td class="comp">'+esc(x.comp)+'</td></tr>';
+  }).join("");
+  $("matchTable").innerHTML=head+'<tbody>'+body+'</tbody>';
+  Array.prototype.forEach.call(document.querySelectorAll(".mchk"),function(cb){
+    cb.onchange=function(){ if(this.checked)SELECTED.add(this.dataset.kw); else SELECTED.delete(this.dataset.kw); drawTrendChart(m); };
+  });
+  drawTrendChart(m);
+  if(DATES.length<2){ empty.style.display="block"; empty.innerHTML='<div class="note">아직 수집 일자가 1개라 추이는 점으로 표시됩니다. 날짜가 쌓이면 자동으로 선으로 이어집니다.</div>'; }
+}
+
+function renderTopN(){
+  var date=$("topDate").value, N=parseInt($("topN").value,10);
+  var rs=ROWS.filter(function(r){return r.date===date && !isNaN(r.vol);}).sort(function(a,b){return b.vol-a.vol;}).slice(0,N);
+  var max=rs.length?rs[0].vol:1;
+  $("topBars").innerHTML=rs.map(function(r){
+    var w=Math.max(2,(r.vol/max)*100);
+    return '<div class="barrow"><div class="nm" title="'+esc(r.kw)+'">'+esc(r.kw)+'</div>'+
+      '<div class="bar" style="width:'+w+'%"></div><div class="val">'+fmt(r.vol)+'</div></div>';
+  }).join("") || '<div class="empty">데이터 없음</div>';
+  var head='<thead><tr><th>#</th><th class="l">키워드</th><th class="l">카테고리</th><th>검색량</th><th>증감률</th><th>상품수</th><th>경쟁</th></tr></thead>';
+  var body=rs.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td class="l">'+esc(r.kw)+'</td>'+
+      '<td class="l comp">'+esc([r.c2,r.c3].filter(Boolean).join(" / "))+'</td>'+
+      '<td>'+fmt(r.vol)+'</td><td>'+pctChip(r.chg)+'</td><td>'+fmt(r.prod)+'</td>'+
+      '<td class="comp">'+esc(r.comp)+'</td></tr>';
+  }).join("");
+  $("topTable").innerHTML=head+'<tbody>'+body+'</tbody>';
+}
+
+function renderRising(){
+  var date=$("riseDate").value, N=parseInt($("riseN").value,10);
+  var rs=ROWS.filter(function(r){return r.date===date && !isNaN(r.chg);}).sort(function(a,b){return b.chg-a.chg;}).slice(0,N);
+  var head='<thead><tr><th>#</th><th class="l">키워드</th><th class="l">카테고리</th><th>증감률</th><th>검색량</th><th>전일</th><th>경쟁</th></tr></thead>';
+  var body=rs.map(function(r,i){
+    return '<tr><td>'+(i+1)+'</td><td class="l">'+esc(r.kw)+'</td>'+
+      '<td class="l comp">'+esc([r.c2,r.c3].filter(Boolean).join(" / "))+'</td>'+
+      '<td>'+pctChip(r.chg)+'</td><td>'+fmt(r.vol)+'</td><td>'+fmt(r.prev)+'</td>'+
+      '<td class="comp">'+esc(r.comp)+'</td></tr>';
+  }).join("");
+  $("riseTable").innerHTML=head+'<tbody>'+(body||'<tr><td colspan="7" class="empty">데이터 없음</td></tr>')+'</tbody>';
+}
+
+function fillDateSelectors(){
+  var opts=DATES.map(function(d){return '<option>'+esc(d)+'</option>';}).join("");
+  ["topDate","riseDate"].forEach(function(id){ var s=$(id); s.innerHTML=opts; s.value=DATES[DATES.length-1]; });
+}
+
+function refreshAll(){
+  renderKpis(); fillDateSelectors();
+  resetSelection(); renderTrendSearch();
+  renderTopN(); renderRising();
+}
+
+// ---------- data load ----------
+function setStatus(msg,err){ var s=$("status"); s.innerHTML=msg; s.className="status"+(err?" err":""); }
+function num(x){ return (x==null||x==="")?NaN:Number(x); }
+
+// gviz JSON table -> ROWS (CORS-free via <script> injection)
+function ingestTable(table){
+  var labels=table.cols.map(function(c){return c.label||"";});
+  COLS=detectCols(labels);
+  if(COLS.kw==null||COLS.vol==null) throw new Error("키워드/검색량 열을 찾지 못했습니다. 헤더를 확인하세요.");
+  ROWS=[];
+  (table.rows||[]).forEach(function(row){
+    var c=row.c||[];
+    function cell(i){ return (i!=null && c[i]) ? c[i] : null; }
+    function v(i){ var x=cell(i); return x?x.v:null; }
+    function fv(i){ var x=cell(i); return x?(x.f!=null?x.f:x.v):null; }
+    var kw=String(v(COLS.kw)||"").trim(); if(!kw) return;
+    var chgCell=cell(COLS.chg);
+    var chg = (chgCell && chgCell.v!=null && chgCell.v!=="") ? Number(chgCell.v)*100 : NaN;
+    ROWS.push({
+      date:String((COLS.date!=null?(fv(COLS.date)||""):"")).trim(),
+      rank:num(v(COLS.rank)),
+      kw:kw,
+      c1:String(fv(COLS.c1)||"").trim(),
+      c2:String(fv(COLS.c2)||"").trim(),
+      c3:String(fv(COLS.c3)||"").trim(),
+      vol:num(v(COLS.vol)),
+      prev:num(v(COLS.prev)),
+      chg:chg,
+      prod:num(v(COLS.prod)),
+      comp:String(fv(COLS.comp)||"").trim()
+    });
+  });
+  DATES=Array.from(new Set(ROWS.map(function(r){return r.date;}).filter(Boolean))).sort();
+}
+
+var _cbn=0;
+function loadLive(){
+  var id=$("sheetId").value.trim(), tab=$("tabName").value.trim();
+  if(!id){ setStatus("시트 ID를 입력하세요.",true); return; }
+  setStatus("불러오는 중…");
+  var cb="zzCb"+(++_cbn), done=false;
+  var s=document.createElement("script");
+  function cleanup(){ try{delete window[cb];}catch(_){window[cb]=undefined;} if(s.parentNode)s.parentNode.removeChild(s); }
+  window[cb]=function(resp){
+    done=true;
+    try{
+      if(!resp||resp.status==="error"){
+        var em=(resp&&resp.errors&&resp.errors[0])?(resp.errors[0].detailed_message||resp.errors[0].message):"응답 오류";
+        throw new Error(em.replace(/<[^>]+>/g,""));
+      }
+      ingestTable(resp.table); refreshAll();
+      setStatus("불러옴 · "+ROWS.length.toLocaleString()+"행 · 일자 "+DATES.length+"개 · "+new Date().toLocaleString());
+    }catch(e){ setStatus("불러오기 실패: "+e.message+" — 시트 공유를 '링크가 있는 모든 사용자(뷰어)'로 설정했는지 확인하세요.",true); }
+    cleanup();
+  };
+  s.onerror=function(){ if(done)return; setStatus("불러오기 실패 — 네트워크 또는 시트 공유 설정(링크가 있는 모든 사용자=뷰어)을 확인하거나 CSV 업로드를 이용하세요.",true); cleanup(); };
+  s.src="https://docs.google.com/spreadsheets/d/"+encodeURIComponent(id)+
+    "/gviz/tq?tqx=out:json;responseHandler:"+cb+"&sheet="+encodeURIComponent(tab)+"&_="+Date.now();
+  document.body.appendChild(s);
+  setTimeout(function(){ if(!done){ setStatus("응답이 없습니다 — 시트 공유(링크가 있는 모든 사용자=뷰어)를 확인하거나 CSV 업로드를 이용하세요.",true); cleanup(); } },12000);
+}
+
+// ---------- events ----------
+$("loadBtn").onclick=loadLive;
+$("fileBtn").onclick=function(){ $("fileInput").click(); };
+$("fileInput").onchange=function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){ try{ ingest(r.result); refreshAll(); setStatus("업로드 파일 로드됨 · "+ROWS.length.toLocaleString()+"행"); }catch(err){ setStatus(err.message,true);} };
+  r.readAsText(f,"utf-8");
+};
+var _st;
+$("kwSearch").addEventListener("input",function(){
+  var self=this; clearTimeout(_st);
+  _st=setTimeout(function(){ SEARCH_TERM=self.value.trim(); resetSelection(); renderTrendSearch(); },200);
+});
+$("selAll").onclick=function(){ SELECTED=new Set(currentMatches().map(function(m){return m.kw;})); renderTrendSearch(); };
+$("selNone").onclick=function(){ SELECTED=new Set(); renderTrendSearch(); };
+Array.prototype.forEach.call(document.querySelectorAll("#metricSeg .segb"),function(b){
+  b.onclick=function(){
+    TREND_METRIC=this.dataset.m;
+    document.querySelectorAll("#metricSeg .segb").forEach(function(x){x.classList.remove("on");});
+    this.classList.add("on");
+    drawTrendChart(currentMatches());
+  };
+});
+$("topDate").onchange=renderTopN; $("topN").onchange=renderTopN;
+$("riseDate").onchange=renderRising; $("riseN").onchange=renderRising;
+document.querySelectorAll("nav.tabs .t").forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll("nav.tabs .t").forEach(function(x){x.classList.remove("on");});
+    t.classList.add("on");
+    ["trend","topn","rising"].forEach(function(v){ $("view_"+v).style.display=(v===t.dataset.v)?"block":"none"; });
+  };
+});
+
+// init
+$("sheetId").value=DEFAULT_ID; $("tabName").value=DEFAULT_TAB;
+loadLive();
+</script>
+</body>
+</html>
