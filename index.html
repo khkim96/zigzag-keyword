@@ -382,6 +382,12 @@ function drawTrendChart(matches){
   var ct=$("volCt"); if(ct) ct.textContent = metric==='rank' ? '순위 추이 (체크한 키워드 · 위=상위)' : '검색량 추이 (체크한 키워드)';
   lineChartMulti($("chart_vol"), series, {invert:metric==='rank', metric:metric});
 }
+function syncMasterChk(m){
+  var master=$("mchkAll"); if(!master) return;
+  var selCount=m.filter(function(x){return SELECTED.has(x.kw);}).length;
+  master.checked = m.length>0 && selCount===m.length;
+  master.indeterminate = selCount>0 && selCount<m.length;
+}
 function renderTrendSearch(){
   var m=currentMatches(), empty=$("trendEmpty"), kbox=$("trendKpis");
   if(!SEARCH_TERM){ empty.style.display="block"; empty.textContent='위에 포함할 단어를 입력하세요. (예: "얇은")';
@@ -393,7 +399,8 @@ function renderTrendSearch(){
   var sum=m.reduce(function(a,x){return a+(isNaN(x.vol)?0:x.vol);},0);
   $("t_cnt").textContent=m.length; $("t_sum").textContent=fmt(sum); $("t_top").textContent=m[0].kw;
   kbox.style.display="grid";
-  var head='<thead><tr><th></th><th>#</th><th class="l">키워드</th><th>검색량</th><th>순위</th><th>증감률</th><th>경쟁</th></tr></thead>';
+  var selCount=m.filter(function(x){return SELECTED.has(x.kw);}).length;
+  var head='<thead><tr><th><input type="checkbox" id="mchkAll" title="전체 선택/해제"></th><th>#</th><th class="l">키워드</th><th>검색량</th><th>순위</th><th>증감률</th><th>경쟁</th></tr></thead>';
   var body=m.map(function(x,i){
     return '<tr><td><input type="checkbox" class="mchk" '+(SELECTED.has(x.kw)?"checked":"")+' data-kw="'+esc(x.kw)+'"></td>'+
       '<td>'+(i+1)+'</td><td class="l">'+esc(x.kw)+'</td><td>'+fmt(x.vol)+'</td>'+
@@ -401,8 +408,16 @@ function renderTrendSearch(){
   }).join("");
   $("matchTable").innerHTML=head+'<tbody>'+body+'</tbody>';
   Array.prototype.forEach.call(document.querySelectorAll(".mchk"),function(cb){
-    cb.onchange=function(){ if(this.checked)SELECTED.add(this.dataset.kw); else SELECTED.delete(this.dataset.kw); drawTrendChart(m); };
+    cb.onchange=function(){ if(this.checked)SELECTED.add(this.dataset.kw); else SELECTED.delete(this.dataset.kw); syncMasterChk(m); drawTrendChart(m); };
   });
+  var master=$("mchkAll");
+  master.checked = m.length>0 && selCount===m.length;
+  master.indeterminate = selCount>0 && selCount<m.length;
+  master.onchange=function(){
+    if(this.checked){ m.forEach(function(x){SELECTED.add(x.kw);}); } else { m.forEach(function(x){SELECTED.delete(x.kw);}); }
+    Array.prototype.forEach.call(document.querySelectorAll(".mchk"),function(cb){ cb.checked=this.checked; }.bind(this));
+    drawTrendChart(m);
+  };
   drawTrendChart(m);
   if(DATES.length<2){ empty.style.display="block"; empty.innerHTML='<div class="note">아직 수집 일자가 1개라 추이는 점으로 표시됩니다. 날짜가 쌓이면 자동으로 선으로 이어집니다.</div>'; }
 }
